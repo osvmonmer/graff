@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+      <template id="addenda_koblez" name="Koblenz">
+        <requestForPayment type="SimpleInvoiceType" contentVersion="1.3.1" documentStructureVersion="AMC7.1" documentStatus="ORIGINAL" t-att-DeliveryDate="record.invoice_date">
+         <t t-set="cfdi_vals" t-value="record.l10n_mx_edi_get_serie_and_folio()"/>
+              <requestForPaymentIdentification>
+        <entityType>INVOICE</entityType>
+        <t t-set="serie" t-value="cfdi_vals['serie_number']"/>
+      <t t-set="folio" t-value="cfdi_vals['folio_number']"/>
+       <uniqueCreatorIdentification t-esc="str(serie)+str(folio)" />
+      </requestForPaymentIdentification>
+      <specialInstruction code="ZZZ">
+        <t t-set="amount_text" t-value="record._l10n_mx_edi_cfdi_amount_to_text()"/>
+        <text t-esc="amount_text" />
+      </specialInstruction>
+      <orderIdentification>
+      <referenceIdentification type="ON" t-field="record.fields_sales.name" />
+      <ReferenceDate t-field="record.fields_sales.date_order" t-options='{"format": "yyyy-MM-dd"}' />
+    </orderIdentification>
+    <AdditionalInformation>
+      <referenceIdentification type="IV"/>
+    </AdditionalInformation>
+    <DeliveryNote>
+      <referenceIdentification>0</referenceIdentification>
+      <ReferenceDate t-field="record.fields_sales.date_order" t-options='{"format": "yyyy-MM-dd"}' />
+    </DeliveryNote>
+     <buyer>
+      <gln t-esc="record.partner_id.gln if record.partner_id.gln else '0000000000000'" />
+      <contactInformation>
+        <personDepartamentName>
+          <text t-field="record.partner_id.user_id.name" />
+        </personDepartamentName>
+      </contactInformation>
+    </buyer>
+      <seller>
+      <gln t-esc="record.company_id.field_gln_company if record.company_id.field_gln_company else '0000000000000'" />
+      <t t-set="numprov" t-value="record.partner_id.number_provideer" />
+      <alternatePartyIdentification type="SELLER_ASSIGNED_IDENTIFIER_FOR_A_PARTY" t-esc="numprov" />
+    </seller>
+       <shipTo>
+      <gln t-esc="record.partner_shipping_id.number_sucursal if record.partner_shipping_id.number_sucursal else '0000000000000'" />
+      <nameAddress>
+        <name t-field="record.partner_shipping_id.name" />
+        <streetAddressOne t-field="record.partner_shipping_id.street" />
+        <city t-field="record.partner_shipping_id.city"/>
+        <postalCode t-field="record.partner_shipping_id.zip"/>
+      </nameAddress>
+     </shipTo>
+      <currency t-att-currencyISOCode="record.currency_id.name">
+      <currencyFunction>BILLING_CURRENCY</currencyFunction>
+      <rateOfChange>1</rateOfChange>
+    </currency>
+      <t t-set="cont" t-value="0" />
+    <t t-foreach="record.invoice_line_ids" t-as="rec" >
+      <t t-set="cont" t-value="cont + 1" />
+      <lineItem type="SimpleInvoiceLineItemType" t-att-number="cont">
+        <tradeItemIdentification>
+          <gtin t-esc="rec.product_id.barcode if rec.product_id.barcode else '0000000000000'"/>
+        </tradeItemIdentification>
+        <alternateTradeItemIdentification type="BUYER_ASSIGNED" t-esc="rec.product_id.barcode" />
+        <tradeItemDescriptionInformation language="ES">
+          <longText t-esc="rec.product_id.name" />
+        </tradeItemDescriptionInformation>
+        <invoicedQuantity unitOfMeasure="PZ" t-esc="rec.quantity" />       
+        <grossPrice>
+          <amount t-esc="'%.2f'% rec.price_unit" />
+        </grossPrice>
+        <netPrice>
+          <amount t-esc="'%.2f'% rec.price_unit" />
+        </netPrice>
+        <t t-set="amount" t-value="0" />
+          <t t-foreach="rec.tax_ids" t-as="tac" >
+              <t t-set="result" t-value="rec.price_unit" />
+              <t t-set="resultoper" t-value="result * (tac.amount / 100)" />
+              <t t-set="amount" t-value="amount + resultoper" />
+              <tradeItemTaxInformation>
+                <taxTypeDescription>VAT</taxTypeDescription>
+                <tradeItemTaxAmount>
+                  <taxPercentaje t-esc="'%.2f'% tac.amount" />
+                  <taxAmount t-esc="'%.2f'% amount" />
+                </tradeItemTaxAmount>
+                <taxCategory>TRANSFERIDO</taxCategory>
+              </tradeItemTaxInformation>
+          </t>
+           <totalLineAmount>
+            <t t-set="subtotalformat" t-value="rec.price_subtotal" />
+            <grossAmount>
+              <Amount t-esc="'%.2f'% float(subtotalformat)" />
+            </grossAmount>
+            <netAmount>
+              <Amount t-esc="'%.2f'% float(subtotalformat)" />
+            </netAmount>
+          </totalLineAmount>
+      </lineItem>
+    </t>
+     <totalAmount>
+      <t t-set="valamount" t-value="0" />
+      <t t-foreach="record.invoice_line_ids" t-as="rec" >
+        <t t-set="valamount" t-value="valamount + rec.price_subtotal" />
+      </t>
+      <Amount t-esc="'%.2f'% valamount" />
+    </totalAmount>
+    <TotalAllowanceCharge allowanceOrChargeType="ALLOWANCE">
+      <specialServicesType>ABZ</specialServicesType>
+      <Amount>0</Amount>
+      </TotalAllowanceCharge>
+     <baseAmount>
+      <Amount t-esc="'%.2f'% valamount" />
+    </baseAmount>
+        <t t-set="ivatotal" t-value="0" />
+    <t t-set="valiva" t-value="0" />
+    <t t-set="namimp" t-value="0" />
+    <t t-set="validipes" t-value="0" />
+    <t t-set="iepstotal" t-value="0" />
+    <t t-set="namieps" t-value="0" />
+    <t t-foreach="record.invoice_line_ids" t-as="rec" >
+      <t t-set="amount" t-value="0" />
+      <t t-set="amountiep" t-value="0" />
+        <t t-foreach="rec.tax_ids" t-as="tac" >
+            
+                <t t-set="result" t-value="rec.price_unit" />
+                <t t-set="resultoper" t-value="result * (tac.amount / 100)" />
+                <t t-set="amount" t-value="amount + resultoper" />
+                <t t-set="ivatotal" t-value="ivatotal + amount" />
+                <t t-set="valiva" t-value="tac.amount" />
+                <t t-set="namimp" t-value="tac.description" />
+          </t>
+        </t>
+   
+    
+      <tax t-att-type="VAT">
+        <taxPercentage t-esc="'%.2f'% valiva" />
+        <taxAmount t-esc="'%.2f'% ivatotal" />
+        <taxCategory>TRANSFERIDO</taxCategory>
+      </tax>
+    
+      <payableAmount>
+      <t t-set="amountpay" t-value="record.amount_total" />
+      <Amount t-esc="float(amountpay)" />
+    </payableAmount>
+        </requestForPayment>
+      
+      </template>
+        <record id="addenda_koblez" model="ir.ui.view">
+            <field name="l10n_mx_edi_addenda_flag">True</field>
+        </record>
+    </data>
+</odoo>
+
+

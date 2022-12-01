@@ -1,0 +1,20 @@
+<odoo>
+  <data>
+     <record id="add_camp_gnl" model="ir.ui.view">
+      <field name="name">add.camp.gnl</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='internal_notes']" position="after">
+          <page name="koblenz_information" string="koblenz information">
+            <group>                        
+              <field name="number_sucursal"/>
+              <field name="gln"/>
+              <field name="number_provideer"/>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record> 
+  </data>
+</odoo>

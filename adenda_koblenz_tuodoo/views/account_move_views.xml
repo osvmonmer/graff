@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+     <record id="add_field_account" model="ir.ui.view">
+      <field name="name">add.field.account</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='l10n_mx_edi_usage']" position="after">
+          <field name="fields_sales" invisible="0"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
