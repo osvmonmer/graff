@@ -9,7 +9,7 @@
         
     """,
 
-    'author': "My Company",
+    'author': "tuodoo",
     'website': "http://www.yourcompany.com",
     'category': 'Uncategorized',
     'version': '14.1',
