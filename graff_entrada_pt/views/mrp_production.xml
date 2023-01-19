@@ -1,0 +1,15 @@
+
+<odoo>
+    <record id="mrp_production_inherit" model="ir.ui.view">
+        <field name="name">mrp.production.inherit</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="res_partner_id"/>
+                <field name="sale_id"/>
+                <field name="producto_reporte_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
