@@ -9,8 +9,8 @@
         
     """,
 
-    'author': "My Company",
-    'website': "http://www.yourcompany.com",
+    'author': "TuOdoo",
+    'website': "http://www.tuodoo.com",
     'category': 'Uncategorized',
     'version': '14.1',
     'depends': ['mrp'],
