@@ -1,4 +1,0 @@
-[submodule "reporte_mrp"]
-	path = reporte_mrp
-	url = git@github.com:kletzel/graff-pruebas.git
-	branch = master
