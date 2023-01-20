@@ -29,8 +29,27 @@ class ReportMrp(models.TransientModel):
             if mrp:
                 for m in mrp:
                     if m.producto_reporte_id:
+                        print("xxxx sale", m.sale_id.name)
                         sale = self.env['sale.order.line'].search([('order_id', '=', m.sale_id.id),('product_id', '=', m.producto_reporte_id.id)],limit=1)
-                        print("++++++++++++",sale)
+                        print("++++++++++++",sale.order_id.pricelist_id.currency_id.name)
+                        tasa = 0
+                        if sale.order_id.pricelist_id.currency_id.name == 'USD':
+                            print("xx USD xxx",sale.order_id.date_order)
+                            date = fields.Datetime.to_string(fields.Datetime.context_timestamp(self, fields.Datetime.from_string(sale.order_id.date_order)))[:10]
+                            print("xxxxxxxxxxxxDATExxxxxxxxx",date)
+                            tasa = 0
+                            tcd = 0
+                            pvmxd = 0
+                            imported = 0
+                            if sale.order_id.pricelist_id.currency_id.name == 'USD':
+                                date = fields.Datetime.to_string(fields.Datetime.context_timestamp(self, fields.Datetime.from_string(sale.order_id.date_order)))[:10]
+                                print("xxxxxxxxxxxxDATExxxxxxxxx",date)
+                                tasas = self.env['res.currency.rate'].search([('name', '=', date),('currency_id', '=', sale.order_id.pricelist_id.currency_id.id)],limit=1)
+                                if tasas:
+                                    tcd = 1 / tasas.rate
+                                    pvmxd = sale.price_unit * tcd
+                                    imported = pvmxd * m.product_qty
+                                    print("xxxx tasa xxxx", tasa , tasas.name)
                         datas.append({
                             'date': m.date_finished,
                             'cantidad': m.product_qty,
@@ -43,14 +62,33 @@ class ReportMrp(models.TransientModel):
                             'peso': m.product_id.weight * m.product_qty,
                             'estado': 'TERMINADO',
                             'pv': sale.price_unit if sale else 0,
-                            'importe': sale.price_unit * m.product_qty if sale else 0,     
+                            
+                            'currency_id': sale.order_id.pricelist_id.currency_id.id if sale.order_id.pricelist_id else False,
+                            'tc': tcd if sale.order_id.pricelist_id.currency_id.name == 'USD' else 1,
+                            'pvmx': pvmxd if sale.order_id.pricelist_id.currency_id.name == 'USD' else sale.price_unit,
+                            'importe': imported if sale.order_id.pricelist_id.currency_id.name == 'USD' else sale.price_unit * m.product_qty,   
                             'date_star': rec.date_star,
                             'date_end': rec.date_end,
 
                         })
                     else:
+                        print("xxxx sale", m.sale_id.name)
                         sale = self.env['sale.order.line'].search([('order_id', '=', m.sale_id.id),('product_id', '=', m.product_id.id)],limit=1)
-                        print("++++++++++++",sale)
+                        print("++++++++++++",sale.order_id.pricelist_id.currency_id.name)
+                        tasa = 0
+                        tcd = 0
+                        pvmxd = 0
+                        imported = 0
+                        if sale.order_id.pricelist_id.currency_id.name == 'USD':
+                            date = fields.Datetime.to_string(fields.Datetime.context_timestamp(self, fields.Datetime.from_string(sale.order_id.date_order)))[:10]
+                            print("xxxxxxxxxxxxDATExxxxxxxxx",date)
+                            tasas = self.env['res.currency.rate'].search([('name', '=', date),('currency_id', '=', sale.order_id.pricelist_id.currency_id.id)],limit=1)
+                            if tasas:
+                                tcd = 1 / tasas.rate
+                                pvmxd = sale.price_unit * tcd
+                                imported = pvmxd * m.product_qty
+                                print("xxxx tasa xxxx", tasa , tasas.name)
+                            
                         datas.append({
                             'date': m.date_finished,
                             'cantidad': m.product_qty,
@@ -63,7 +101,10 @@ class ReportMrp(models.TransientModel):
                             'peso': m.product_id.weight * m.product_qty,
                             'estado': 'TERMINADO',
                             'pv': sale.price_unit if sale else 0,
-                            'importe': sale.price_unit * m.product_qty if sale else 0,     
+                            'currency_id': sale.order_id.pricelist_id.currency_id.id if sale.order_id.pricelist_id else False,
+                            'tc': tcd if sale.order_id.pricelist_id.currency_id.name == 'USD' else 1,
+                            'pvmx': pvmxd if sale.order_id.pricelist_id.currency_id.name == 'USD' else sale.price_unit,
+                            'importe': imported if sale.order_id.pricelist_id.currency_id.name == 'USD' else sale.price_unit * m.product_qty,     
                             'date_star': rec.date_star,
                             'date_end': rec.date_end,
 

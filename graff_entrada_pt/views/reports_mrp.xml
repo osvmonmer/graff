@@ -12,10 +12,13 @@
                     <field name="product_id"/>
                     <field name="op_id" />
                     <field name="res_partner_id" />
-                    <field name="pesouni" />  
+                    <field name="pesouni" />
                     <field name="peso" />  
                     <field name="estado" />
                     <field name="pv" />
+                    <field name="currency_id"/>
+                    <field name="tc"/>
+                    <field name="pvmx"/> 
                     <field name="importe" sum="importe"/>
                 </tree>
             </field>
