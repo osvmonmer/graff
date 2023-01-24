@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_limit_credit_disallow_sale_tuodoo_limit_credit_disallow_sale_tuodoo,limit_credit_disallow_sale_tuodoo.limit_credit_disallow_sale_tuodoo,model_limit_credit_disallow_sale_tuodoo_limit_credit_disallow_sale_tuodoo,base.group_user,1,1,1,1
