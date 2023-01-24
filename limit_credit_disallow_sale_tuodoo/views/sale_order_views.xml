@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="sale_order_form_limit_credit">
+        <field name="name">sale.order.form.limit_credit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,locked,sale"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="active_credit" invisible="1"/>
+                 <label for="amount_limit_total" class="oe_inline"  attrs="{'invisible': [('active_credit', '=', False)]}"/>
+                <div class="o_row">
+                 <field name="amount_limit_total" readonly="1" force_save="1" attrs="{'invisible': [('active_credit', '=', False)]}"/>
+                 <button name="validate_invoice" string="Actualizar credito disponible"
+                        class="oe_link oe_inline"
+                        type="object" attrs="{'invisible': [('active_credit', '=', False)]}"/>
+                 </div>
+                <field name="limit_state" widget="state_selection" readonly="1" force_save="1" attrs="{'invisible': [('active_credit', '=', False)]}"/>
+                <field name="inv_state" widget="state_selection" readonly="1" force_save="1" attrs="{'invisible': [('active_credit', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_draft']" position="after">
+                <button name="action_confirm_lock" states="locked" type="object" string="Desbloquear" groups="limit_credit_disallow_sale_tuodoo.group_locked"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
